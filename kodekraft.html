@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KodeKraft – AI-Powered Enterprise Software</title>
+  <meta name="description" content="Build AI-powered CRM, WhatsApp Automation, AI Calling, and Enterprise Software that help businesses grow faster." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: #072D38; background: #fff; }
+
+    /* Loading screen */
+    #loading-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #fff;
+      transition: opacity 0.5s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+    .loading-bar {
+      width: 256px; height: 2px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin-top: 40px;
+    }
+    .loading-bar-inner {
+      height: 100%; width: 50%; border-radius: 99px;
+      background: linear-gradient(to right, transparent, #0F87A0, transparent);
+      animation: loading-sweep 1.4s ease-in-out infinite;
+    }
+    @keyframes loading-sweep {
+      0% { transform: translateX(-200%); }
+      100% { transform: translateX(400%); }
+    }
+
+    /* Marquee */
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-33.33%); }
+    }
+    .marquee-track { animation: marquee 20s linear infinite; display: flex; align-items: center; white-space: nowrap; }
+
+    /* Dot grid hero bg */
+    .dot-grid {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Fade-in on scroll */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+    .stagger-1 { transition-delay: 0.05s; }
+    .stagger-2 { transition-delay: 0.10s; }
+    .stagger-3 { transition-delay: 0.15s; }
+    .stagger-4 { transition-delay: 0.20s; }
+    .stagger-5 { transition-delay: 0.25s; }
+    .stagger-6 { transition-delay: 0.30s; }
+    .stagger-7 { transition-delay: 0.35s; }
+    .stagger-8 { transition-delay: 0.40s; }
+
+    /* Bar animation */
+    .bar-fill { width: 0; transition: width 1.2s ease-out; }
+    .bar-fill.animate { }
+
+    /* Pulse dot */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Calling waveform */
+    @keyframes waveform {
+      0%, 100% { height: 20%; }
+      50% { height: 100%; }
+    }
+    .wave-bar { width: 6px; background: rgba(255,255,255,0.7); border-radius: 99px; animation: waveform 0.8s ease-in-out infinite; }
+
+    /* Calling ripple */
+    @keyframes ripple {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .ripple { animation: ripple 2s ease-in-out infinite; }
+
+    /* Hover transitions */
+    .card-hover { transition: box-shadow 0.3s, transform 0.3s; }
+    .card-hover:hover { box-shadow: 0 20px 40px rgba(15,135,160,0.15); transform: translateY(-4px); }
+
+    /* Accordion */
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+    .accordion-content.open { max-height: 300px; }
+    .accordion-trigger svg { transition: transform 0.3s; }
+    .accordion-trigger.open svg { transform: rotate(180deg); }
+
+    /* Mobile menu */
+    #mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    #mobile-menu.open { max-height: 400px; }
+
+    /* Product mockup visibility */
+    .product-mockup { display: none; width: 100%; height: 100%; }
+    .product-mockup.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Pipeline bars */
+    .pipeline-bar-fill { width: 0; transition: width 1.2s ease-out; }
+
+    /* Gradient text */
+    .grad-text {
+      background: linear-gradient(to right, #7EE8FA, #B8F5FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .grad-text-teal {
+      background: linear-gradient(to right, #0B6D82, #13A9C6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* SVG icon sizing */
+    .icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+    /* Testimonials auto-scroll */
+    .scroll-container { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .scroll-container::-webkit-scrollbar { display: none; }
+
+    /* Progress bar initial state (handled by JS) */
+    .pipeline-bar-container .fill { width: 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-white text-slate-900">
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div style="font-family:'Times New Roman',Times,serif; font-size:2rem; font-weight:700; color:#0F87A0; letter-spacing:0.05em;">KodeKraft</div>
+  <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+</div>
+
+<!-- Main Content -->
+<div id="main" style="opacity:0; transition:opacity 0.7s ease;">
+
+<!-- ============================================================ NAVBAR -->
+<header id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300" style="background:linear-gradient(to right,#0B6D82,#0F87A0); padding:16px 0;">
+  <div class="container mx-auto px-4 md:px-8 flex items-center justify-between">
+    <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;"
+       style="color:#fff; font-family:'Times New Roman',Times,serif; font-size:1.35rem; font-weight:600; letter-spacing:0.02em; text-decoration:none;">
+      KodeKraft
+    </a>
+    <nav class="hidden md:flex items-center gap-8">
+      <button onclick="scrollTo('#products')" class="text-sm font-medium transition-colors" style="color:rgba(255,255,255,0.85); background:none; border:none; cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Products</button>
+      <button onclick="scrollTo('#services')" class="text-sm font-medium transition-colors" style="color:rgba(255,255,255,0.85); background:none; border:none; cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Services</button>
+      <button onclick="scrollTo('#about')" class="text-sm font-medium transition-colors" style="color:rgba(255,255,255,0.85); background:none; border:none; cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">About</button>
+      <button onclick="scrollTo('#case-studies')" class="text-sm font-medium transition-colors" style="color:rgba(255,255,255,0.85); background:none; border:none; cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Case Studies</button>
+      <button onclick="scrollTo('#contact')" class="text-sm font-medium transition-colors" style="color:rgba(255,255,255,0.85); background:none; border:none; cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Contact</button>
+    </nav>
+    <div class="hidden md:flex">
+      <button onclick="scrollTo('#contact')" class="font-semibold rounded-full px-7 h-10 transition-all border-0 cursor-pointer text-sm" style="background:rgba(255,255,255,0.18); color:#fff; backdrop-filter:blur(8px);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.18)'">
+        Book a Demo
+      </button>
+    </div>
+    <button id="mobile-toggle" class="md:hidden p-2 text-white" style="background:none; border:none; cursor:pointer;">
+      <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="mobile-menu" style="background:rgba(11,109,130,0.97); backdrop-filter:blur(12px);">
+    <div class="flex flex-col px-4 py-4 gap-4">
+      <button onclick="scrollTo('#products'); closeMobile()" class="text-left text-base font-medium py-2 border-b" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.1); background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;">Products</button>
+      <button onclick="scrollTo('#services'); closeMobile()" class="text-left text-base font-medium py-2 border-b" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.1); background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;">Services</button>
+      <button onclick="scrollTo('#about'); closeMobile()" class="text-left text-base font-medium py-2 border-b" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.1); background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;">About</button>
+      <button onclick="scrollTo('#case-studies'); closeMobile()" class="text-left text-base font-medium py-2 border-b" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.1); background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;">Case Studies</button>
+      <button onclick="scrollTo('#contact'); closeMobile()" class="text-left text-base font-medium py-2 border-b" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.1); background:none; border-top:none; border-left:none; border-right:none; cursor:pointer;">Contact</button>
+      <button onclick="scrollTo('#contact'); closeMobile()" class="w-full mt-2 rounded-full font-semibold border-0 py-3 cursor-pointer text-sm" style="background:rgba(255,255,255,0.2); color:#fff;">Book a Demo</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================ HERO -->
+<section class="relative min-h-screen flex items-center pt-24 pb-20 overflow-hidden"
+  style="background:linear-gradient(135deg,#083D4A 0%,#0B6D82 40%,#0F87A0 75%,#13A9C6 100%);">
+  <div class="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-[0.07]" style="background:radial-gradient(circle,#fff 0%,transparent 70%)"></div>
+  <div class="absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full opacity-[0.05]" style="background:radial-gradient(circle,#fff 0%,transparent 70%)"></div>
+  <div class="absolute inset-0 dot-grid opacity-[0.07]"></div>
+  <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%,rgba(255,255,255,0.02) 100%)"></div>
+  <div class="absolute bottom-0 left-0 right-0 h-32" style="background:linear-gradient(to bottom,transparent,rgba(11,109,130,0.2))"></div>
+
+  <div class="relative container mx-auto px-4 md:px-8">
+    <div class="flex flex-col lg:flex-row items-center gap-16">
+
+      <!-- Left -->
+      <div class="flex-1 text-center lg:text-left z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-medium text-white mb-8 backdrop-blur-sm" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2);">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          AI-Powered Enterprise Software
+        </div>
+
+        <h1 class="text-5xl md:text-6xl lg:text-7xl xl:text-[80px] font-semibold leading-[1.05] tracking-tight text-white mb-6"
+            style="font-family:'Times New Roman',Times,serif;">
+          Build Smarter<br class="hidden lg:block" />
+          <span class="grad-text">Businesses</span> with AI.
+        </h1>
+
+        <p class="text-lg md:text-xl mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light" style="color:rgba(255,255,255,0.75);">
+          We build AI-powered CRM systems, AI Calling Solutions, WhatsApp Automation,
+          Workflow Automation and Enterprise Software that help businesses grow faster.
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-5 mb-10 text-sm" style="color:rgba(255,255,255,0.7);">
+          <span class="flex items-center gap-1.5">
+            <svg class="icon text-emerald-400" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Enterprise-grade security
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg class="icon text-emerald-400" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Deployed in 2–4 weeks
+          </span>
+          <span class="flex items-center gap-1.5">
+            <svg class="icon text-emerald-400" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Full source code ownership
+          </span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12">
+          <button onclick="scrollTo('#contact')" class="w-full sm:w-auto h-14 px-8 text-base rounded-full border-0 font-semibold cursor-pointer flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5"
+            style="background:#fff; color:#072D38; box-shadow:0 4px 24px rgba(0,0,0,0.2);"
+            onmouseover="this.style.boxShadow='0 8px 32px rgba(0,0,0,0.3)'" onmouseout="this.style.boxShadow='0 4px 24px rgba(0,0,0,0.2)'">
+            Book a Demo
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <button onclick="scrollTo('#products')" class="w-full sm:w-auto h-14 px-8 text-base rounded-full text-white font-medium cursor-pointer flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 backdrop-blur-sm"
+            style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3);"
+            onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            View Platform
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+          <span class="px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-sm" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8);">AI CRM</span>
+          <span class="px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-sm" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8);">WhatsApp Automation</span>
+          <span class="px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-sm" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8);">AI Calling</span>
+          <span class="px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-sm" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8);">Workflow Engine</span>
+          <span class="px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-sm" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:rgba(255,255,255,0.8);">Custom Software</span>
+        </div>
+      </div>
+
+      <!-- Right: CRM Mockup -->
+      <div class="flex-1 w-full relative z-10">
+        <div class="absolute inset-0 rounded-3xl opacity-30 blur-3xl" style="background:radial-gradient(ellipse,rgba(255,255,255,0.2) 0%,transparent 70%)"></div>
+        <div class="relative rounded-2xl overflow-hidden" style="background:rgba(255,255,255,0.08); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.18); box-shadow:0 40px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);">
+          <!-- Browser bar -->
+          <div class="px-4 py-3 flex items-center gap-2 border-b" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12);">
+            <div class="flex gap-1.5">
+              <div class="w-3 h-3 rounded-full" style="background:rgba(255,255,255,0.2)"></div>
+              <div class="w-3 h-3 rounded-full" style="background:rgba(255,255,255,0.2)"></div>
+              <div class="w-3 h-3 rounded-full" style="background:rgba(255,255,255,0.2)"></div>
+            </div>
+            <div class="mx-auto rounded-md text-[10px] px-3 py-1 font-mono w-48 text-center border" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:rgba(255,255,255,0.5);">app.kodekraft.ai</div>
+          </div>
+          <!-- Dashboard -->
+          <div class="p-5 grid gap-4" style="grid-template-columns:1fr 3fr;">
+            <div class="space-y-3">
+              <div class="h-8 rounded-md mb-6" style="background:rgba(255,255,255,0.15)"></div>
+              <div class="h-6 rounded-md" style="background:rgba(255,255,255,0.09); width:80%"></div>
+              <div class="h-6 rounded-md" style="background:rgba(255,255,255,0.28); width:100%"></div>
+              <div class="h-6 rounded-md" style="background:rgba(255,255,255,0.09); width:80%"></div>
+              <div class="h-6 rounded-md" style="background:rgba(255,255,255,0.09); width:80%"></div>
+              <div class="h-6 rounded-md" style="background:rgba(255,255,255,0.09); width:80%"></div>
+            </div>
+            <div class="space-y-4">
+              <div class="grid grid-cols-3 gap-3">
+                <div class="p-3 rounded-xl border" style="background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.15);">
+                  <div class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:rgba(255,255,255,0.5);">Active Leads</div>
+                  <div class="text-xl font-bold text-white leading-none mb-1">284</div>
+                  <div class="text-[9px] font-semibold" style="color:#7EE8FA;">+12% this week</div>
+                </div>
+                <div class="p-3 rounded-xl border" style="background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.15);">
+                  <div class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:rgba(255,255,255,0.5);">Calls Today</div>
+                  <div class="text-xl font-bold text-white leading-none mb-1">47</div>
+                  <div class="text-[9px] font-semibold" style="color:#7EE8FA;">+8% this week</div>
+                </div>
+                <div class="p-3 rounded-xl border" style="background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.15);">
+                  <div class="text-[9px] font-semibold uppercase tracking-wider mb-1" style="color:rgba(255,255,255,0.5);">Conversion</div>
+                  <div class="text-xl font-bold text-white leading-none mb-1">38%</div>
+                  <div class="text-[9px] font-semibold" style="color:#7EE8FA;">+5% this week</div>
+                </div>
+              </div>
+              <div class="p-4 rounded-xl border" style="background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12);">
+                <div class="flex justify-between items-center mb-4">
+                  <div class="text-xs font-semibold text-white">Sales Pipeline</div>
+                  <div class="flex items-center gap-1 text-[9px] font-medium" style="color:#7EE8FA;">⚡ Live</div>
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-20 text-[10px] font-medium" style="color:rgba(255,255,255,0.55);">New Leads</div>
+                    <div class="flex-1 h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.08);">
+                      <div class="pipeline-bar-fill h-full rounded-full" data-width="80%" style="background:linear-gradient(to right,rgba(255,255,255,0.6),rgba(255,255,255,0.3))"></div>
+                    </div>
+                    <div class="text-[10px] w-8 text-right" style="color:rgba(255,255,255,0.5);">80%</div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-20 text-[10px] font-medium" style="color:rgba(255,255,255,0.55);">Contacted</div>
+                    <div class="flex-1 h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.08);">
+                      <div class="pipeline-bar-fill h-full rounded-full" data-width="55%" style="background:linear-gradient(to right,rgba(255,255,255,0.6),rgba(255,255,255,0.3))"></div>
+                    </div>
+                    <div class="text-[10px] w-8 text-right" style="color:rgba(255,255,255,0.5);">55%</div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-20 text-[10px] font-medium" style="color:rgba(255,255,255,0.55);">Qualified</div>
+                    <div class="flex-1 h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.08);">
+                      <div class="pipeline-bar-fill h-full rounded-full" data-width="35%" style="background:linear-gradient(to right,rgba(255,255,255,0.6),rgba(255,255,255,0.3))"></div>
+                    </div>
+                    <div class="text-[10px] w-8 text-right" style="color:rgba(255,255,255,0.5);">35%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating chips -->
+        <div class="absolute -right-4 top-1/4 bg-white p-3 rounded-2xl flex items-center gap-3 z-20" style="box-shadow:0 20px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);">
+          <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="text-xs font-semibold" style="color:#072D38;">WhatsApp AI</div>
+            <div class="text-[10px]" style="color:#45606C;">Replied in 2s</div>
+          </div>
+        </div>
+
+        <div class="absolute -left-4 bottom-1/3 bg-white p-3 rounded-2xl flex items-center gap-3 z-20" style="box-shadow:0 20px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:#F0FAFE; color:#0F87A0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 15.18 19.79 19.79 0 0 1 1.93 6.55 2 2 0 0 1 3.9 4.36h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 12a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 18.92z"/></svg>
+          </div>
+          <div>
+            <div class="text-xs font-semibold" style="color:#072D38;">AI Voice Agent</div>
+            <div class="text-[10px]" style="color:#45606C;">Meeting scheduled</div>
+          </div>
+        </div>
+
+        <div class="absolute right-8 -bottom-4 bg-white p-3 rounded-2xl flex items-center gap-2 z-20" style="box-shadow:0 20px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);">
+          <div class="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center text-amber-500">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="text-xs font-semibold" style="color:#072D38;">Workflow triggered</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ TECH LOGO STRIP -->
+<section class="py-12 overflow-hidden" style="border-top:1px solid rgba(15,135,160,0.08); border-bottom:1px solid rgba(15,135,160,0.08); background:#F6FBFC;">
+  <div class="container mx-auto px-4 mb-6">
+    <p class="text-center text-sm font-medium uppercase tracking-widest" style="color:#9ca3af;">Trusted Technologies</p>
+  </div>
+  <div class="relative flex overflow-x-hidden w-full">
+    <div class="marquee-track">
+      <div class="flex items-center gap-16 px-8">
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.843-3.369 2.02-1.168a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.402-.681zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/></svg>
+          OpenAI
+        </span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6.915 4.03c-1.968.02-3.337 1.047-3.337 2.847 0 1.325.78 2.107 1.862 2.107.785 0 1.452-.43 1.452-1.386 0-.981-.587-1.517-1.46-1.517-.096 0-.208.01-.313.034.08-.49.473-1.034 1.09-1.34.24-.123.56-.195.905-.215l.801-.047zM4.32 7.5c0 .783.434 1.316 1.164 1.316.614 0 1.098-.429 1.098-1.316 0-.878-.484-1.282-1.098-1.282-.73 0-1.164.498-1.164 1.282zM24 12.082c0 6.627-5.373 12-12 12S0 18.709 0 12.082 5.373.082 12 .082 24 5.455 24 12.082zm-8.089 4.576c.764 0 1.473-.223 1.998-.561l-.426-.763c-.387.254-.863.395-1.362.395-1.085 0-1.773-.704-1.875-1.777h3.923c.02-.16.03-.33.03-.5 0-2.058-1.221-3.245-2.918-3.245-1.754 0-2.974 1.302-2.974 3.208 0 1.955 1.251 3.243 3.004 3.243zm-.631-5.047c.87 0 1.425.587 1.505 1.585H13.81c.116-1.008.735-1.585 1.47-1.585zm5.04-.133c-.58 0-1.044.256-1.327.683l-.083-.567h-.897v6.065h1.024v-3.975c.163-.562.6-.893 1.157-.893.28 0 .52.076.749.23l.339-.952a1.762 1.762 0 0 0-.963-.59zm-12.65.133c.87 0 1.425.587 1.505 1.585H6.69c.117-1.008.736-1.585 1.47-1.585l.511.001zm-.63-1.586H5.89l.01 6.066h1.022v-2.38a4.56 4.56 0 0 1-.01-.43v-.103c.163-.562.6-.893 1.157-.893.28 0 .52.076.75.23l.338-.952a1.762 1.762 0 0 0-.963-.59c-.58 0-1.044.256-1.327.683l-.083-.567H5.89v.066l-.01-.13z"/></svg>
+          Meta
+        </span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">🅖 Google</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">⊞ Microsoft</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">☁ AWS</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">🐘 PostgreSQL</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">⚛ React</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">🟢 Node.js</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">🐍 Python</span>
+        <!-- duplicate for seamless loop -->
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">OpenAI</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">Meta</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">Google</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">Microsoft</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">AWS</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">PostgreSQL</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">React</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">Node.js</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300" style="color:#374151;">Python</span>
+        <!-- third set -->
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60" style="color:#374151;">OpenAI</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60" style="color:#374151;">Meta</span>
+        <span class="flex items-center gap-2 font-semibold text-lg opacity-60" style="color:#374151;">Google</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SERVICES -->
+<section id="services" class="py-28 relative overflow-hidden" style="background:#F6FBFC;">
+  <div class="absolute top-0 right-0 w-96 h-96 rounded-full opacity-30 pointer-events-none" style="background:radial-gradient(circle,rgba(15,135,160,0.08) 0%,transparent 70%); transform:translate(30%,-30%)"></div>
+  <div class="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-20 pointer-events-none" style="background:radial-gradient(circle,rgba(11,109,130,0.1) 0%,transparent 70%); transform:translate(-30%,30%)"></div>
+  <div class="relative container mx-auto px-4 md:px-8">
+    <div class="mb-16 max-w-2xl">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Services</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 leading-tight reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">
+        Everything your <span class="grad-text-teal">business needs</span> to grow
+      </h2>
+      <p class="text-lg leading-relaxed reveal" style="color:#45606C;">End-to-end automation and intelligent systems designed for modern enterprises.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- Service cards -->
+      <div class="reveal stagger-1 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">01</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(11,109,130,0.09); border:1px solid rgba(11,109,130,0.15); color:#0B6D82;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">AI CRM</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Intelligent lead management and sales pipelines built around your workflow.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0B6D82;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-2 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">02</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(15,135,160,0.09); border:1px solid rgba(15,135,160,0.15); color:#0F87A0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">WhatsApp Automation</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Engage customers 24/7 on their favourite platform with AI-driven replies.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0F87A0;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-3 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">03</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(19,169,198,0.09); border:1px solid rgba(19,169,198,0.15); color:#13A9C6;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Instagram Automation</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Turn followers into qualified leads with instant DM responses and sequences.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#13A9C6;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-4 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">04</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(11,109,130,0.09); border:1px solid rgba(11,109,130,0.15); color:#0B6D82;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Facebook Automation</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Scale your ad responses instantly and never lose a lead in your inbox.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0B6D82;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-1 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">05</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(15,135,160,0.09); border:1px solid rgba(15,135,160,0.15); color:#0F87A0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 15.18 19.79 19.79 0 0 1 1.93 6.55 2 2 0 0 1 3.9 4.36h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 12a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 18.92z"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">AI Calling</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Human-like voice agents that qualify leads and book meetings over phone.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0F87A0;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-2 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">06</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(19,169,198,0.09); border:1px solid rgba(19,169,198,0.15); color:#13A9C6;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Custom Software</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Bespoke enterprise applications architected for scale and longevity.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#13A9C6;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-3 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">07</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(11,109,130,0.09); border:1px solid rgba(11,109,130,0.15); color:#0B6D82;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Dashboard Development</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Real-time analytics and data visualisation tailored to your KPIs.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0B6D82;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-4 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">08</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(15,135,160,0.09); border:1px solid rgba(15,135,160,0.15); color:#0F87A0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><path d="M13 17h8m-4-4v8"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Workflow Automation</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Connect your tools and eliminate manual tasks with smart triggers.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0F87A0;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-1 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col md:col-span-2 lg:col-span-1" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">09</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(19,169,198,0.09); border:1px solid rgba(19,169,198,0.15); color:#13A9C6;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="m12 2 2 5h5l-4 3 2 5-5-3-5 3 2-5-4-3h5z"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">API Integration</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">Seamless data flow between every system your business relies on.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#13A9C6;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+      <div class="reveal stagger-2 group relative bg-white border rounded-2xl p-6 card-hover flex flex-col md:col-span-2 lg:col-span-1" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 16px rgba(15,135,160,0.06);">
+        <div class="absolute top-4 right-5 text-[11px] font-bold tabular-nums" style="color:rgba(15,135,160,0.15);">10</div>
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style="background:rgba(11,109,130,0.09); border:1px solid rgba(11,109,130,0.15); color:#0B6D82;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3 class="font-semibold text-[17px] mb-2 leading-snug" style="color:#072D38;">Website Development</h3>
+        <p class="text-sm leading-relaxed flex-1" style="color:#5A7480;">High-performance marketing and product sites that convert visitors.</p>
+        <div class="mt-5 flex items-center gap-1 text-sm font-semibold opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style="color:#0B6D82;">Learn more <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ PRODUCTS -->
+<section id="products" class="py-24 bg-white border-t" style="border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="text-center mb-16">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Our Platform</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">The KodeKraft Platform</h2>
+      <p class="text-lg max-w-2xl mx-auto reveal" style="color:#45606C;">A suite of powerful enterprise tools designed to work together seamlessly.</p>
+    </div>
+    <div class="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
+      <!-- Tabs -->
+      <div class="lg:w-1/3 flex flex-col gap-2">
+        <button onclick="setProduct('crm')" id="tab-crm" class="product-tab flex items-start gap-4 p-4 rounded-xl text-left transition-all border bg-white shadow-md" style="border-color:rgba(15,135,160,0.15);">
+          <div class="mt-0.5 w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:rgba(15,135,160,0.1); color:#0F87A0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div><h3 class="font-semibold" style="color:#072D38;">KodeKraft CRM</h3><p class="text-sm mt-1" style="color:#45606C;">Intelligent lead management system.</p></div>
+        </button>
+        <button onclick="setProduct('agent')" id="tab-agent" class="product-tab flex items-start gap-4 p-4 rounded-xl text-left transition-all border border-transparent hover:bg-[#F6FBFC]" style="color:#45606C;">
+          <div class="mt-0.5 w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#F6FBFC; color:#45606C;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V4"/><path d="M7.5 6.5C8 5 9 4 12 4s4 1 4.5 2.5"/></svg>
+          </div>
+          <div><h3 class="font-semibold" style="color:#45606C;">AI Sales Agent</h3><p class="text-sm mt-1" style="color:#45606C;">Automated chat responses that convert.</p></div>
+        </button>
+        <button onclick="setProduct('calling')" id="tab-calling" class="product-tab flex items-start gap-4 p-4 rounded-xl text-left transition-all border border-transparent hover:bg-[#F6FBFC]">
+          <div class="mt-0.5 w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#F6FBFC; color:#45606C;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 15.18a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 4.36h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 12a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 18.92z"/></svg>
+          </div>
+          <div><h3 class="font-semibold" style="color:#45606C;">AI Calling Platform</h3><p class="text-sm mt-1" style="color:#45606C;">Human-like voice agents for outreach.</p></div>
+        </button>
+        <button onclick="setProduct('analytics')" id="tab-analytics" class="product-tab flex items-start gap-4 p-4 rounded-xl text-left transition-all border border-transparent hover:bg-[#F6FBFC]">
+          <div class="mt-0.5 w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#F6FBFC; color:#45606C;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div><h3 class="font-semibold" style="color:#45606C;">Lead Dashboard</h3><p class="text-sm mt-1" style="color:#45606C;">Real-time insights and tracking.</p></div>
+        </button>
+        <button onclick="setProduct('workflow')" id="tab-workflow" class="product-tab flex items-start gap-4 p-4 rounded-xl text-left transition-all border border-transparent hover:bg-[#F6FBFC]">
+          <div class="mt-0.5 w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background:#F6FBFC; color:#45606C;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div><h3 class="font-semibold" style="color:#45606C;">Automation Engine</h3><p class="text-sm mt-1" style="color:#45606C;">Connect and automate everything.</p></div>
+        </button>
+      </div>
+
+      <!-- Display area -->
+      <div class="lg:w-2/3">
+        <div class="relative aspect-[4/3] md:aspect-[16/9] w-full rounded-2xl bg-white p-2 lg:p-4 border shadow-xl overflow-hidden" style="border-color:rgba(15,135,160,0.1); box-shadow:0 8px 40px rgba(15,135,160,0.1);">
+
+          <!-- CRM Mockup -->
+          <div id="mockup-crm" class="product-mockup active" style="display:block;">
+            <div class="bg-white rounded-xl border shadow-sm overflow-hidden h-full flex flex-col" style="border-color:rgba(15,135,160,0.12);">
+              <div class="border-b p-4 flex justify-between items-center" style="border-color:rgba(15,135,160,0.08); background:#F6FBFC;">
+                <div class="font-semibold text-sm" style="color:#072D38;">Leads Pipeline</div>
+                <div class="flex gap-2">
+                  <div class="px-2 py-1 text-[10px] bg-white border rounded" style="color:#45606C; border-color:rgba(15,135,160,0.15);">Filter</div>
+                  <div class="px-2 py-1 text-[10px] text-white rounded" style="background:linear-gradient(to right,#0F8BA5,#1CBAD6);">Add Lead</div>
+                </div>
+              </div>
+              <table class="w-full text-left text-sm flex-1">
+                <thead class="text-xs" style="background:#F6FBFC; color:#45606C;">
+                  <tr><th class="px-4 py-3 font-medium">Name</th><th class="px-4 py-3 font-medium">Status</th><th class="px-4 py-3 font-medium">Value</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-t hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.06);"><td class="px-4 py-3 font-medium" style="color:#072D38;">Acme Corp</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-700">Qualified</span></td><td class="px-4 py-3" style="color:#45606C;">$12,000</td></tr>
+                  <tr class="border-t hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.06);"><td class="px-4 py-3 font-medium" style="color:#072D38;">TechFlow Inc</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700">Negotiation</span></td><td class="px-4 py-3" style="color:#45606C;">$8,500</td></tr>
+                  <tr class="border-t hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.06);"><td class="px-4 py-3 font-medium" style="color:#072D38;">Global Industries</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-[10px] font-medium" style="background:rgba(15,135,160,0.06); color:#45606C;">New</span></td><td class="px-4 py-3" style="color:#45606C;">$24,000</td></tr>
+                  <tr class="border-t hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.06);"><td class="px-4 py-3 font-medium" style="color:#072D38;">Nexus Systems</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-700">Qualified</span></td><td class="px-4 py-3" style="color:#45606C;">$5,200</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AI Agent Mockup -->
+          <div id="mockup-agent" class="product-mockup" style="display:none;">
+            <div class="bg-white rounded-xl border shadow-sm overflow-hidden h-full flex flex-col" style="border-color:rgba(15,135,160,0.12);">
+              <div class="text-white p-4 flex items-center gap-3" style="background:linear-gradient(to right,#0B6D82,#0F87A0);">
+                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">🤖</div>
+                <div><div class="text-sm font-semibold">KodeKraft Assistant</div><div class="text-[10px] text-white/80">Online</div></div>
+              </div>
+              <div class="flex-1 p-4 flex flex-col gap-3" style="background:#F6FBFC;">
+                <div class="self-end px-3 py-2 rounded-lg rounded-tr-none text-sm max-w-[80%] shadow-sm" style="background:rgba(15,135,160,0.12); color:#072D38;">Hi, I'm interested in the CRM system.<span class="text-[9px] block text-right mt-1" style="color:#45606C;">10:42 AM</span></div>
+                <div class="self-start bg-white px-3 py-2 rounded-lg rounded-tl-none text-sm max-w-[80%] shadow-sm border" style="color:#072D38; border-color:rgba(15,135,160,0.1);">Hello! 👋 I'd be happy to help. Our CRM is built specifically for growing teams. How many users are you looking to onboard?<span class="text-[9px] block text-right mt-1" style="color:#45606C;">10:42 AM</span></div>
+                <div class="self-end px-3 py-2 rounded-lg rounded-tr-none text-sm max-w-[80%] shadow-sm" style="background:rgba(15,135,160,0.12); color:#072D38;">About 15 people on the sales team.<span class="text-[9px] block text-right mt-1" style="color:#45606C;">10:43 AM</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calling Mockup -->
+          <div id="mockup-calling" class="product-mockup" style="display:none;">
+            <div class="rounded-xl border shadow-sm overflow-hidden h-full flex flex-col" style="background:linear-gradient(135deg,#0B6D82,#13A9C6); border-color:rgba(15,135,160,0.2);">
+              <div class="p-6 flex flex-col items-center justify-center flex-1 relative overflow-hidden">
+                <div class="absolute inset-0 flex items-center justify-center opacity-15">
+                  <div class="absolute w-32 h-32 rounded-full border border-white ripple" style="animation-delay:0s;"></div>
+                  <div class="absolute w-32 h-32 rounded-full border border-white ripple" style="animation-delay:0.4s;"></div>
+                  <div class="absolute w-32 h-32 rounded-full border border-white ripple" style="animation-delay:0.8s;"></div>
+                </div>
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 z-10 text-4xl">📞</div>
+                <div class="text-xl font-medium mb-1 z-10 text-white">Active Call</div>
+                <div class="text-sm z-10 mb-8" style="color:rgba(255,255,255,0.7);">Speaking with John Doe...</div>
+                <div class="flex items-center gap-1 h-8 z-10">
+                  <div class="wave-bar" style="animation-delay:0s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.1s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.2s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.3s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.4s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.5s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.6s;"></div>
+                  <div class="wave-bar" style="animation-delay:0.7s;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Mockup -->
+          <div id="mockup-analytics" class="product-mockup" style="display:none;">
+            <div class="bg-white rounded-xl border shadow-sm overflow-hidden h-full p-4" style="border-color:rgba(15,135,160,0.12);">
+              <div class="flex gap-4 h-full">
+                <div class="w-1/3 flex flex-col gap-3">
+                  <div class="p-3 rounded-lg flex-1 border" style="background:#F6FBFC; border-color:rgba(15,135,160,0.1);"><div class="text-[10px] uppercase tracking-wider mb-1" style="color:#45606C;">Conversion Rate</div><div class="text-2xl font-bold" style="color:#072D38;">32.4%</div></div>
+                  <div class="p-3 rounded-lg flex-1 border" style="background:#F6FBFC; border-color:rgba(15,135,160,0.1);"><div class="text-[10px] uppercase tracking-wider mb-1" style="color:#45606C;">Avg Deal Size</div><div class="text-2xl font-bold" style="color:#072D38;">$4.2k</div></div>
+                </div>
+                <div class="w-2/3 rounded-lg border p-3 relative flex items-end" style="background:#F6FBFC; border-color:rgba(15,135,160,0.1);">
+                  <div class="w-full flex items-end justify-between gap-2" style="height:75%;">
+                    <div class="w-full rounded-t-sm" style="height:40%; background:rgba(15,135,160,0.4);"></div>
+                    <div class="w-full rounded-t-sm" style="height:70%; background:rgba(15,135,160,0.55);"></div>
+                    <div class="w-full rounded-t-sm" style="height:45%; background:rgba(15,135,160,0.43);"></div>
+                    <div class="w-full rounded-t-sm" style="height:90%; background:rgba(15,135,160,0.65);"></div>
+                    <div class="w-full rounded-t-sm" style="height:60%; background:rgba(15,135,160,0.50);"></div>
+                    <div class="w-full rounded-t-sm" style="height:100%; background:rgba(15,135,160,0.70);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workflow Mockup -->
+          <div id="mockup-workflow" class="product-mockup" style="display:none;">
+            <div class="rounded-xl border shadow-sm overflow-hidden h-full p-6 relative" style="background:#F6FBFC; border-color:rgba(15,135,160,0.12);">
+              <div class="absolute top-8 left-8 w-32 bg-white p-3 rounded-lg shadow-sm border z-10" style="border-color:rgba(15,135,160,0.15);">
+                <div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full bg-green-500"></div><div class="text-xs font-semibold" style="color:#072D38;">New Lead</div></div>
+                <div class="text-[9px]" style="color:#45606C;">Trigger</div>
+              </div>
+              <svg class="absolute inset-0 w-full h-full pointer-events-none" style="color:rgba(15,135,160,0.2);">
+                <path d="M 120 60 C 180 60, 160 120, 220 120" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+                <path d="M 220 120 C 280 120, 260 60, 320 60" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+              </svg>
+              <div class="absolute top-24 left-[200px] w-36 bg-white p-3 rounded-lg shadow-sm border z-10 border-l-4" style="border-color:rgba(15,135,160,0.15); border-left-color:#0F87A0;">
+                <div class="flex items-center gap-2 mb-1"><span style="color:#0F87A0; font-size:10px;">⚡</span><div class="text-xs font-semibold" style="color:#072D38;">Enrich Data</div></div>
+                <div class="text-[9px]" style="color:#45606C;">Action</div>
+              </div>
+              <div class="absolute top-8 right-8 w-36 bg-white p-3 rounded-lg shadow-sm border z-10" style="border-color:rgba(15,135,160,0.15);">
+                <div class="flex items-center gap-2 mb-1"><span class="text-green-500 text-[10px]">💬</span><div class="text-xs font-semibold" style="color:#072D38;">Send WhatsApp</div></div>
+                <div class="text-[9px]" style="color:#45606C;">Action</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ FEATURES BENTO -->
+<section class="py-24 border-t" style="background:#F6FBFC; border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="mb-16 text-center">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-3 reveal" style="color:#0F87A0;">Platform Features</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Built for enterprise. Loved by teams.</h2>
+      <p class="text-lg max-w-2xl mx-auto reveal" style="color:#45606C;">Every tool your team needs to move faster, sell smarter, and automate everything.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+      <!-- Lead Management - wide -->
+      <div class="md:col-span-2 relative rounded-3xl overflow-hidden border bg-white card-hover group min-h-[300px] reveal" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="absolute inset-0"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80&fit=crop" alt="" class="w-full h-full object-cover opacity-[0.06] group-hover:opacity-[0.09] transition-opacity duration-500"/></div>
+        <div class="relative p-8 flex flex-col h-full">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(15,135,160,0.08); border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Lead Management</h3>
+          <p class="mb-6 max-w-sm" style="color:#45606C;">Centralize your entire sales pipeline. Score, segment, and prioritize leads automatically using AI intelligence — all in one intuitive interface.</p>
+          <div class="mt-auto flex gap-3 flex-wrap">
+            <span class="px-3 py-1 text-xs font-medium rounded-full border" style="background:rgba(15,135,160,0.06); border-color:rgba(15,135,160,0.15); color:#0F87A0;">Scoring</span>
+            <span class="px-3 py-1 text-xs font-medium rounded-full border" style="background:rgba(15,135,160,0.06); border-color:rgba(15,135,160,0.15); color:#0F87A0;">Segmentation</span>
+            <span class="px-3 py-1 text-xs font-medium rounded-full border" style="background:rgba(15,135,160,0.06); border-color:rgba(15,135,160,0.15); color:#0F87A0;">Pipeline View</span>
+            <span class="px-3 py-1 text-xs font-medium rounded-full border" style="background:rgba(15,135,160,0.06); border-color:rgba(15,135,160,0.15); color:#0F87A0;">Auto-assign</span>
+          </div>
+        </div>
+      </div>
+      <!-- Automation -->
+      <div class="relative rounded-3xl overflow-hidden border bg-white card-hover group min-h-[300px] reveal stagger-1" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative p-8 flex flex-col h-full">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(19,169,198,0.08); border-color:rgba(19,169,198,0.20); color:#13A9C6;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-3" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Automation</h3>
+          <p style="color:#45606C;">Set up complex multi-step workflows visually. No code required — trigger actions across WhatsApp, email, and CRM on any condition.</p>
+          <div class="mt-8 space-y-2">
+            <div class="flex items-center gap-2 text-xs" style="color:#45606C;"><div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] text-white" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">1</div>Trigger on lead capture</div>
+            <div class="flex items-center gap-2 text-xs" style="color:#45606C;"><div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] text-white" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">2</div>Auto-reply via WhatsApp</div>
+            <div class="flex items-center gap-2 text-xs" style="color:#45606C;"><div class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] text-white" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">3</div>CRM update</div>
+          </div>
+        </div>
+      </div>
+      <!-- AI Assistant - colored -->
+      <div class="relative rounded-3xl overflow-hidden border card-hover group min-h-[300px] reveal stagger-2" style="background:linear-gradient(135deg,#0B6D82 0%,#0F87A0 50%,#13A9C6 100%); border-color:rgba(15,135,160,0.2);">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent)]"></div>
+        <div class="relative p-8 flex flex-col h-full">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2); color:white;">
+            🤖
+          </div>
+          <h3 class="text-2xl font-semibold text-white mb-3" style="font-family:'Times New Roman',Times,serif;">AI Assistant</h3>
+          <p style="color:rgba(255,255,255,0.75);">Context-aware AI that drafts responses, qualifies leads, and suggests next actions — in real time, on every conversation.</p>
+          <div class="mt-6 rounded-xl p-4 border" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.15);">
+            <div class="text-[11px] mb-2 font-mono" style="color:rgba(255,255,255,0.5);">AI SUGGESTION</div>
+            <div class="text-sm text-white">"This lead has visited pricing 3 times. Recommend sending a personalized demo invite."</div>
+          </div>
+        </div>
+      </div>
+      <!-- Analytics -->
+      <div class="relative rounded-3xl overflow-hidden border bg-white card-hover group reveal stagger-3" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative p-8 flex flex-col h-full">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(11,109,130,0.08); border-color:rgba(11,109,130,0.15); color:#0B6D82;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Analytics</h3>
+          <p class="text-sm" style="color:#45606C;">Real-time dashboards, funnel analysis, and revenue attribution in one view.</p>
+          <div class="mt-4 flex items-end gap-1 h-12">
+            <div class="flex-1 rounded-sm" style="height:40%; background:rgba(15,135,160,0.22);"></div>
+            <div class="flex-1 rounded-sm" style="height:65%; background:rgba(15,135,160,0.37);"></div>
+            <div class="flex-1 rounded-sm" style="height:45%; background:rgba(15,135,160,0.25);"></div>
+            <div class="flex-1 rounded-sm" style="height:80%; background:rgba(15,135,160,0.52);"></div>
+            <div class="flex-1 rounded-sm" style="height:55%; background:rgba(15,135,160,0.32);"></div>
+            <div class="flex-1 rounded-sm" style="height:90%; background:rgba(15,135,160,0.60);"></div>
+            <div class="flex-1 rounded-sm" style="height:70%; background:rgba(15,135,160,0.47);"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Reports -->
+      <div class="relative rounded-3xl overflow-hidden border bg-white card-hover reveal stagger-4" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="p-8">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(19,169,198,0.06); border-color:rgba(19,169,198,0.15); color:#0F8BA5;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Reports</h3>
+          <p class="text-sm" style="color:#45606C;">Automated daily summaries delivered to your inbox — no manual exports needed.</p>
+        </div>
+      </div>
+      <!-- Smart Alerts -->
+      <div class="relative rounded-3xl overflow-hidden border bg-white card-hover reveal stagger-5" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="p-8">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(15,135,160,0.06); border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Smart Alerts</h3>
+          <p class="text-sm" style="color:#45606C;">Get notified instantly when a hot lead engages, a deal stalls, or an SLA is at risk.</p>
+        </div>
+      </div>
+      <!-- API Integrations -->
+      <div class="relative rounded-3xl overflow-hidden border bg-white card-hover reveal stagger-6" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="p-8">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 border" style="background:rgba(11,109,130,0.08); border-color:rgba(11,109,130,0.15); color:#0B6D82;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2" style="color:#072D38; font-family:'Times New Roman',Times,serif;">API Integrations</h3>
+          <p class="text-sm" style="color:#45606C;">Connect with Salesforce, HubSpot, Stripe, Meta, OpenAI and any REST API without writing custom connectors.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ WHY KODEKRAFT -->
+<section class="relative py-24" style="background:#F6FBFC;">
+  <div class="relative container mx-auto px-4 md:px-8">
+    <div class="text-center mb-16">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Why KodeKraft</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Built different. By design.</h2>
+      <p class="text-lg max-w-2xl mx-auto reveal" style="color:#45606C;">We don't ship templates. Every product is engineered from the ground up for your specific business context.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+      <div class="bg-white border rounded-3xl p-7 transition-all duration-300 card-hover group reveal stagger-1" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.06);">
+        <div class="text-3xl mb-5">🤖</div>
+        <h3 class="text-lg font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">AI-Native Architecture</h3>
+        <p class="text-sm leading-relaxed" style="color:#45606C;">Every system we build is designed AI-first — from the data model to the user interface.</p>
+      </div>
+      <div class="bg-white border rounded-3xl p-7 transition-all duration-300 card-hover group reveal stagger-2" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.06);">
+        <div class="text-3xl mb-5">⚡</div>
+        <h3 class="text-lg font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Rapid Deployment</h3>
+        <p class="text-sm leading-relaxed" style="color:#45606C;">From discovery to live deployment in weeks, not months. We ship fast without cutting corners.</p>
+      </div>
+      <div class="bg-white border rounded-3xl p-7 transition-all duration-300 card-hover group reveal stagger-3" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.06);">
+        <div class="text-3xl mb-5">🔒</div>
+        <h3 class="text-lg font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Enterprise Security</h3>
+        <p class="text-sm leading-relaxed" style="color:#45606C;">Production-grade infrastructure with data isolation, encryption, and compliance-ready design.</p>
+      </div>
+      <div class="bg-white border rounded-3xl p-7 transition-all duration-300 card-hover group reveal stagger-4" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.06);">
+        <div class="text-3xl mb-5">🔗</div>
+        <h3 class="text-lg font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Deep Integrations</h3>
+        <p class="text-sm leading-relaxed" style="color:#45606C;">Seamlessly connect with Meta APIs, OpenAI, Google Workspace, Stripe, and any REST API.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ FOUNDER -->
+<section id="about" class="py-24 bg-white overflow-hidden relative">
+  <div class="absolute inset-0" style="background:radial-gradient(ellipse 60% 50% at 70% 50%, rgba(19,169,198,0.04), transparent)"></div>
+  <div class="relative container mx-auto px-4 md:px-8">
+    <div class="flex flex-col lg:flex-row items-center gap-16 max-w-6xl mx-auto">
+      <!-- Image placeholder -->
+      <div class="w-full lg:w-5/12 relative flex-shrink-0 reveal-left">
+        <div class="aspect-[4/5] rounded-3xl overflow-hidden relative z-10 shadow-2xl border flex items-center justify-center" style="border-color:rgba(15,135,160,0.12); background:linear-gradient(135deg,#0B6D82,#13A9C6);">
+          <div class="text-center text-white p-8">
+            <div class="text-8xl mb-4">👩‍💻</div>
+            <div class="text-2xl font-semibold" style="font-family:'Times New Roman',Times,serif;">Janhavi Khonde</div>
+            <div class="text-sm mt-2" style="color:rgba(255,255,255,0.8);">Founder & AI Engineer</div>
+          </div>
+          <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(15,135,160,0.1),transparent,transparent)"></div>
+        </div>
+        <div class="absolute -inset-4 rounded-3xl blur-2xl -z-10 opacity-30" style="background:linear-gradient(135deg,#0B6D82,#13A9C6)"></div>
+      </div>
+      <!-- Content -->
+      <div class="w-full lg:w-7/12">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Meet the Founder</p>
+        <div class="mb-8 reveal stagger-1">
+          <h3 class="text-4xl md:text-5xl font-semibold mb-2" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Janhavi Khonde</h3>
+          <p class="text-xl font-medium" style="color:#45606C;">Founder & AI Software Engineer</p>
+        </div>
+        <p class="text-lg leading-relaxed mb-10 border-l-2 pl-5 reveal stagger-2" style="color:#45606C; border-color:#0F87A0;">
+          Janhavi built KodeKraft from scratch with a single vision: to make enterprise-grade AI accessible to every business, not just Fortune 500 companies. With deep expertise in AI engineering and full-stack development, she's transforming how businesses automate, communicate, and grow.
+        </p>
+        <div class="grid grid-cols-2 gap-5 mb-10 reveal stagger-3">
+          <div class="border rounded-2xl p-4 hover:border-[#0F87A0]/30 transition-colors" style="border-color:rgba(15,135,160,0.12); background:#F6FBFC;"><div class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:#0F87A0;">Education</div><div class="text-sm font-medium" style="color:#072D38;">B.Tech Information Technology</div></div>
+          <div class="border rounded-2xl p-4 hover:border-[#0F87A0]/30 transition-colors" style="border-color:rgba(15,135,160,0.12); background:#F6FBFC;"><div class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:#0F87A0;">Expertise</div><div class="text-sm font-medium" style="color:#072D38;">Full-Stack & AI Systems</div></div>
+          <div class="border rounded-2xl p-4 hover:border-[#0F87A0]/30 transition-colors" style="border-color:rgba(15,135,160,0.12); background:#F6FBFC;"><div class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:#0F87A0;">Projects</div><div class="text-sm font-medium" style="color:#072D38;">Enterprise CRM & Automation</div></div>
+          <div class="border rounded-2xl p-4 hover:border-[#0F87A0]/30 transition-colors" style="border-color:rgba(15,135,160,0.12); background:#F6FBFC;"><div class="text-xs font-semibold uppercase tracking-wider mb-1" style="color:#0F87A0;">Vision</div><div class="text-sm font-medium" style="color:#072D38;">Making AI Accessible to All</div></div>
+        </div>
+        <div class="flex items-center gap-3 reveal stagger-4">
+          <a href="https://www.linkedin.com/in/janhavi-khonde-b7410029b" target="_blank" class="w-10 h-10 rounded-full border flex items-center justify-center transition-all hover:border-[#0F87A0] hover:text-[#0F87A0] hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.2); color:#45606C;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full border flex items-center justify-center transition-all hover:border-[#0F87A0] hover:text-[#0F87A0] hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.2); color:#45606C;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </a>
+          <a href="https://www.instagram.com/kode.kraft/" target="_blank" class="w-10 h-10 rounded-full border flex items-center justify-center transition-all hover:border-[#0F87A0] hover:text-[#0F87A0] hover:bg-[#F6FBFC]" style="border-color:rgba(15,135,160,0.2); color:#45606C;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ PROCESS -->
+<section class="py-24 bg-white border-t" style="border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="text-center mb-20">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Our Process</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">How we work</h2>
+      <p class="text-lg max-w-2xl mx-auto reveal" style="color:#45606C;">A precise, predictable methodology that guarantees results.</p>
+    </div>
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div class="relative z-10 flex flex-col items-center text-center group reveal stagger-1">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-md border bg-white transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 relative" style="border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <div class="absolute -top-3 -right-3 w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">1</div>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" style="color:#072D38;">Discover</h3>
+          <p class="text-sm" style="color:#45606C;">Audit existing workflows and identify automation opportunities.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group reveal stagger-2">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-md border bg-white transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 relative" style="border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+            <div class="absolute -top-3 -right-3 w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">2</div>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" style="color:#072D38;">Design</h3>
+          <p class="text-sm" style="color:#45606C;">Architect scalable AI solutions and map out integrations.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group reveal stagger-3">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-md border bg-white transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 relative" style="border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <div class="absolute -top-3 -right-3 w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">3</div>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" style="color:#072D38;">Develop</h3>
+          <p class="text-sm" style="color:#45606C;">Build enterprise-grade software using modern stacks.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group reveal stagger-4">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-md border bg-white transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 relative" style="border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+            <div class="absolute -top-3 -right-3 w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">4</div>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" style="color:#072D38;">Deploy</h3>
+          <p class="text-sm" style="color:#45606C;">Seamless rollout with zero downtime to your operations.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group reveal stagger-5">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-md border bg-white transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 relative" style="border-color:rgba(15,135,160,0.15); color:#0F87A0;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="absolute -top-3 -right-3 w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm" style="background:linear-gradient(135deg,#0F8BA5,#1CBAD6);">5</div>
+          </div>
+          <h3 class="font-semibold text-lg mb-2" style="color:#072D38;">Support</h3>
+          <p class="text-sm" style="color:#45606C;">Continuous monitoring, updates, and dedicated assistance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ TECH STACK -->
+<section class="py-24 bg-white border-t" style="border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="text-center mb-16">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Technology</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Our technology foundation</h2>
+      <p class="text-lg max-w-2xl mx-auto reveal" style="color:#45606C;">Built on robust, scalable enterprise technologies.</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+      <div class="reveal stagger-1 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#3b82f6; font-size:1.25rem;">🐍</span><span class="font-medium" style="color:#072D38;">Python</span></div>
+      <div class="reveal stagger-2 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#0F87A0; font-size:1.25rem;">⚛</span><span class="font-medium" style="color:#072D38;">React</span></div>
+      <div class="reveal stagger-3 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#22c55e; font-size:1.25rem;">🟢</span><span class="font-medium" style="color:#072D38;">Node.js</span></div>
+      <div class="reveal stagger-4 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#16a34a; font-size:1.25rem;">🍃</span><span class="font-medium" style="color:#072D38;">MongoDB</span></div>
+      <div class="reveal stagger-5 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#0F8BA5; font-size:1.25rem;">🐘</span><span class="font-medium" style="color:#072D38;">PostgreSQL</span></div>
+      <div class="reveal stagger-6 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#1CBAD6; font-size:1.25rem;">🐳</span><span class="font-medium" style="color:#072D38;">Docker</span></div>
+      <div class="reveal stagger-7 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#072D38; font-size:1.25rem;">🧠</span><span class="font-medium" style="color:#072D38;">OpenAI</span></div>
+      <div class="reveal stagger-8 flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span style="color:#0B6D82; font-size:1.25rem;">📘</span><span class="font-medium" style="color:#072D38;">Meta APIs</span></div>
+      <div class="reveal flex items-center gap-2 px-5 py-3 rounded-full bg-white border hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default" style="border-color:rgba(15,135,160,0.15); box-shadow:0 1px 6px rgba(15,135,160,0.04);"><span class="font-bold text-lg" style="color:#f43f5e;">n8n</span><span class="font-medium" style="color:#072D38;">n8n</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CASE STUDIES -->
+<section id="case-studies" class="py-24 bg-white border-t" style="border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-widest mb-3 reveal" style="color:#0F87A0;">Case Studies</p>
+        <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">What we've built</h2>
+        <p class="text-lg reveal" style="color:#45606C;">Real solutions delivering measurable impact for growing enterprises.</p>
+      </div>
+      <a href="#contact" class="inline-flex items-center gap-2 font-semibold hover:gap-3 transition-all reveal" style="color:#0F87A0;">Start your project <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+      <!-- Case 1 -->
+      <div class="group bg-white rounded-3xl border card-hover overflow-hidden flex flex-col reveal stagger-1" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative h-52 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80&fit=crop&crop=top" alt="AI CRM" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+          <div class="absolute inset-0" style="background:linear-gradient(to bottom,transparent,transparent,rgba(0,0,0,0.1))"></div>
+          <span class="absolute top-4 left-4 inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm" style="background:rgba(15,135,160,0.08); color:#0F87A0;">Sales Automation</span>
+        </div>
+        <div class="p-8 flex flex-col flex-1">
+          <h3 class="text-2xl font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">AI CRM for Sales Teams</h3>
+          <p class="mb-8 leading-relaxed flex-1" style="color:#45606C;">A custom CRM integrated with AI scoring that prioritized high-value leads automatically, transforming the team's close rate.</p>
+          <div class="flex items-center justify-between pt-6 border-t" style="border-color:rgba(15,135,160,0.08);">
+            <div class="flex items-center font-medium text-sm" style="color:#072D38;">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background:rgba(15,135,160,0.1); color:#0F87A0;">📈</div>
+              45% increase in conversion rate
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Case 2 -->
+      <div class="group bg-white rounded-3xl border card-hover overflow-hidden flex flex-col reveal stagger-2" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative h-52 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80&fit=crop&crop=top" alt="Travel" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+          <span class="absolute top-4 left-4 inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm" style="background:rgba(19,169,198,0.08); color:#0B6D82;">Operations</span>
+        </div>
+        <div class="p-8 flex flex-col flex-1">
+          <h3 class="text-2xl font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Travel Automation Platform</h3>
+          <p class="mb-8 leading-relaxed flex-1" style="color:#45606C;">End-to-end booking automation handling WhatsApp queries, itinerary generation, and real-time availability lookups.</p>
+          <div class="flex items-center justify-between pt-6 border-t" style="border-color:rgba(15,135,160,0.08);">
+            <div class="flex items-center font-medium text-sm" style="color:#072D38;">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background:rgba(15,135,160,0.1); color:#0F87A0;">⏱</div>
+              20 hours saved per week
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Case 3 -->
+      <div class="group bg-white rounded-3xl border card-hover overflow-hidden flex flex-col reveal stagger-3" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative h-52 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&fit=crop" alt="Healthcare" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+          <span class="absolute top-4 left-4 inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm" style="background:rgba(11,109,130,0.08); color:#0B6D82;">Healthcare</span>
+        </div>
+        <div class="p-8 flex flex-col flex-1">
+          <h3 class="text-2xl font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Healthcare CRM</h3>
+          <p class="mb-8 leading-relaxed flex-1" style="color:#45606C;">Secure patient management system with automated appointment reminders, follow-up sequences, and compliance-ready data handling.</p>
+          <div class="flex items-center justify-between pt-6 border-t" style="border-color:rgba(15,135,160,0.08);">
+            <div class="flex items-center font-medium text-sm" style="color:#072D38;">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background:rgba(15,135,160,0.1); color:#0F87A0;">🎯</div>
+              Zero missed appointments
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Case 4 -->
+      <div class="group bg-white rounded-3xl border card-hover overflow-hidden flex flex-col reveal stagger-4" style="border-color:rgba(15,135,160,0.12); box-shadow:0 2px 12px rgba(15,135,160,0.05);">
+        <div class="relative h-52 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80&fit=crop&crop=top" alt="Real Estate" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+          <span class="absolute top-4 left-4 inline-block px-3 py-1 text-xs font-semibold rounded-full backdrop-blur-sm" style="background:rgba(28,186,214,0.08); color:#0F87A0;">Real Estate</span>
+        </div>
+        <div class="p-8 flex flex-col flex-1">
+          <h3 class="text-2xl font-semibold mb-3 group-hover:text-[#0F87A0] transition-colors" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Lead Management System</h3>
+          <p class="mb-8 leading-relaxed flex-1" style="color:#45606C;">Multi-channel aggregation dashboard unifying Facebook, Instagram, and website inquiries into a single AI-powered pipeline.</p>
+          <div class="flex items-center justify-between pt-6 border-t" style="border-color:rgba(15,135,160,0.08);">
+            <div class="flex items-center font-medium text-sm" style="color:#072D38;">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background:rgba(15,135,160,0.1); color:#0F87A0;">📈</div>
+              3x faster response time
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ FAQ -->
+<section class="py-24 border-t" style="background:#F6FBFC; border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8 max-w-3xl">
+    <div class="text-center mb-12">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">FAQ</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Frequently Asked Questions</h2>
+    </div>
+    <div class="reveal bg-white rounded-2xl border overflow-hidden shadow-sm" style="border-color:rgba(15,135,160,0.12);">
+      <!-- FAQ items -->
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          What is KodeKraft?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">KodeKraft is an enterprise AI software company. We specialize in building custom CRM platforms, AI Calling solutions, WhatsApp automation, and tailored workflow automations to help businesses scale efficiently.</div>
+      </div>
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          How long does implementation take?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">Implementation timelines vary based on complexity. A standard CRM setup or WhatsApp automation takes 2-4 weeks, while complex custom enterprise software may take 2-3 months from design to full deployment.</div>
+      </div>
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          Do you offer custom software development?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">Yes, we build bespoke software tailored to your exact business requirements, ensuring it integrates perfectly with your existing operations rather than forcing you into a rigid template.</div>
+      </div>
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          What integrations are supported?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">We support seamless integration with major platforms including Salesforce, HubSpot, Stripe, Shopify, Meta (Facebook/WhatsApp/Instagram), OpenAI, Google Workspace, and any tool that offers a REST API.</div>
+      </div>
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          Is my data secure?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">Absolutely. We build on enterprise-grade infrastructure (AWS, Google Cloud) with strict data isolation, encryption at rest and in transit, and adherence to modern security compliance standards.</div>
+      </div>
+      <div class="faq-item border-b" style="border-color:rgba(15,135,160,0.08);">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          Can I try before I buy?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">We offer comprehensive live demos of our platforms using your test data so you can see exactly how the AI performs in your specific business context before making a commitment.</div>
+      </div>
+      <div class="faq-item">
+        <button class="accordion-trigger w-full flex items-center justify-between px-6 py-5 text-left font-medium" style="color:#072D38; background:none; border:none; cursor:pointer;" onclick="toggleFaq(this)">
+          What support do you offer?
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="accordion-content px-6 leading-relaxed" style="color:#45606C;">All deployments include dedicated support, continuous monitoring, and proactive maintenance. We ensure your systems run smoothly with minimal downtime.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CONTACT -->
+<section id="contact" class="py-24 bg-white border-t" style="border-color:rgba(15,135,160,0.08);">
+  <div class="container mx-auto px-4 md:px-8 max-w-6xl">
+    <div class="text-center mb-16">
+      <p class="text-sm font-semibold uppercase tracking-widest mb-4 reveal" style="color:#0F87A0;">Contact</p>
+      <h2 class="text-3xl md:text-5xl font-semibold mb-4 reveal" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Let's build something extraordinary</h2>
+      <p class="text-lg reveal" style="color:#45606C;">Ready to scale your business with AI? Get in touch with our team today.</p>
+    </div>
+    <div class="flex flex-col lg:flex-row gap-12 rounded-3xl p-6 md:p-10 border shadow-sm reveal" style="background:#F6FBFC; border-color:rgba(15,135,160,0.1);">
+      <!-- Form -->
+      <div class="lg:w-3/5 bg-white p-8 rounded-2xl border shadow-sm" style="border-color:rgba(15,135,160,0.1);">
+        <form onsubmit="handleContact(event)" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-sm font-medium block" style="color:#072D38;">Full Name</label>
+              <input id="f-name" type="text" placeholder="John Doe" class="w-full rounded-lg px-4 py-2.5 text-sm border focus:outline-none focus:ring-2" style="background:#F6FBFC; border-color:rgba(15,135,160,0.2); focus-ring-color:#0F87A0; color:#072D38;" onfocus="this.style.borderColor='#0F87A0'" onblur="this.style.borderColor='rgba(15,135,160,0.2)'"/>
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium block" style="color:#072D38;">Work Email</label>
+              <input id="f-email" type="email" placeholder="john@company.com" class="w-full rounded-lg px-4 py-2.5 text-sm border focus:outline-none focus:ring-2" style="background:#F6FBFC; border-color:rgba(15,135,160,0.2); color:#072D38;" onfocus="this.style.borderColor='#0F87A0'" onblur="this.style.borderColor='rgba(15,135,160,0.2)'"/>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium block" style="color:#072D38;">Company Name</label>
+            <input id="f-company" type="text" placeholder="Acme Corp" class="w-full rounded-lg px-4 py-2.5 text-sm border focus:outline-none" style="background:#F6FBFC; border-color:rgba(15,135,160,0.2); color:#072D38;" onfocus="this.style.borderColor='#0F87A0'" onblur="this.style.borderColor='rgba(15,135,160,0.2)'"/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium block" style="color:#072D38;">Message</label>
+            <textarea id="f-message" placeholder="Tell us about your project..." rows="4" class="w-full rounded-lg px-4 py-2.5 text-sm border focus:outline-none resize-none" style="background:#F6FBFC; border-color:rgba(15,135,160,0.2); color:#072D38;" onfocus="this.style.borderColor='#0F87A0'" onblur="this.style.borderColor='rgba(15,135,160,0.2)'"></textarea>
+          </div>
+          <button type="submit" class="w-full h-12 text-white font-medium text-base rounded-xl border-0 transition-all cursor-pointer" style="background:linear-gradient(to right,#0F8BA5,#1CBAD6);" onmouseover="this.style.background='#095F71'" onmouseout="this.style.background='linear-gradient(to right,#0F8BA5,#1CBAD6)'">
+            Send Message
+          </button>
+        </form>
+      </div>
+
+      <!-- Contact options -->
+      <div class="lg:w-2/5 flex flex-col justify-center space-y-8">
+        <div>
+          <h3 class="text-2xl font-semibold mb-6" style="color:#072D38; font-family:'Times New Roman',Times,serif;">Other ways to connect</h3>
+          <div class="space-y-4">
+            <a href="https://wa.me/918605125307" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-4 bg-white rounded-xl border hover:shadow-md transition-all group" style="border-color:rgba(15,135,160,0.12);">
+              <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center text-green-600 text-xl group-hover:bg-green-500 group-hover:text-white transition-colors">💬</div>
+              <div><div class="font-medium" style="color:#072D38;">Chat on WhatsApp</div><div class="text-sm" style="color:#45606C;">+91 86051 25307</div></div>
+            </a>
+            <a href="mailto:janhavikhonde20@gmail.com?subject=Book a Demo - KodeKraft" class="flex items-center gap-4 p-4 bg-white rounded-xl border hover:shadow-md transition-all group" style="border-color:rgba(15,135,160,0.12);">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center transition-colors text-xl" style="background:rgba(15,135,160,0.08); color:#0F87A0;">📅</div>
+              <div><div class="font-medium" style="color:#072D38;">Book a Demo</div><div class="text-sm" style="color:#45606C;">janhavikhonde20@gmail.com</div></div>
+            </a>
+            <a href="mailto:janhavikhonde20@gmail.com" class="flex items-center gap-4 p-4 bg-white rounded-xl border hover:shadow-md transition-all group" style="border-color:rgba(15,135,160,0.12);">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl" style="background:#F6FBFC; color:#45606C;">✉️</div>
+              <div><div class="font-medium" style="color:#072D38;">Email Us</div><div class="text-sm" style="color:#45606C;">janhavikhonde20@gmail.com</div></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ FOOTER -->
+<footer class="bg-white border-t pt-16 pb-8" style="border-color:rgba(15,135,160,0.1);">
+  <div class="container mx-auto px-4 md:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16 max-w-6xl mx-auto">
+      <div class="lg:col-span-2">
+        <p class="font-semibold text-2xl mb-6" style="color:#072D38; font-family:'Times New Roman',Times,serif;">KodeKraft</p>
+        <p class="mb-8 max-w-sm leading-relaxed" style="color:#45606C;">Building enterprise-grade AI software, CRMs, and automation solutions that work for your business.</p>
+        <div class="flex gap-5">
+          <a href="https://www.linkedin.com/in/janhavi-khonde-b7410029b" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full flex items-center justify-center transition-all" style="background:#F6FBFC; color:#45606C;" onmouseover="this.style.background='linear-gradient(to right,#0F8BA5,#1CBAD6)'; this.style.color='white'" onmouseout="this.style.background='#F6FBFC'; this.style.color='#45606C'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+          <a href="https://www.instagram.com/kode.kraft/" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full flex items-center justify-center transition-all" style="background:#F6FBFC; color:#45606C;" onmouseover="this.style.background='linear-gradient(to right,#0F8BA5,#1CBAD6)'; this.style.color='white'" onmouseout="this.style.background='#F6FBFC'; this.style.color='#45606C'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-5 text-sm uppercase tracking-wider" style="color:#072D38;">Quick Links</h4>
+        <ul class="space-y-3">
+          <li><a href="#products" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">Products</a></li>
+          <li><a href="#services" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">Services</a></li>
+          <li><a href="#about" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">About Us</a></li>
+          <li><a href="#contact" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-5 text-sm uppercase tracking-wider" style="color:#072D38;">Products</h4>
+        <ul class="space-y-3">
+          <li><a href="#" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">KodeKraft CRM</a></li>
+          <li><a href="#" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">AI Sales Agent</a></li>
+          <li><a href="#" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">AI Calling Platform</a></li>
+          <li><a href="#" class="text-sm transition-colors hover:text-[#0F87A0]" style="color:#45606C;">Automation Engine</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-5 text-sm uppercase tracking-wider" style="color:#072D38;">Newsletter</h4>
+        <p class="text-sm mb-4 leading-relaxed" style="color:#45606C;">Get the latest insights on AI and automation.</p>
+        <div class="flex">
+          <input type="email" placeholder="Your email" class="w-full border rounded-l-lg px-4 py-2.5 text-sm focus:outline-none" style="background:#F6FBFC; border-color:rgba(15,135,160,0.2); color:#072D38;"/>
+          <button class="text-white px-4 rounded-r-lg transition-colors flex-shrink-0" style="background:linear-gradient(to right,#0F8BA5,#1CBAD6);" onmouseover="this.style.background='#095F71'" onmouseout="this.style.background='linear-gradient(to right,#0F8BA5,#1CBAD6)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 max-w-6xl mx-auto" style="border-color:rgba(15,135,160,0.08);">
+      <p class="text-sm" style="color:#45606C;">© <span id="year"></span> KodeKraft. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+</div><!-- end #main -->
+
+<script>
+  // Utility
+  function scrollTo(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Set year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Loading screen
+  setTimeout(() => {
+    const ls = document.getElementById('loading-screen');
+    ls.classList.add('fade-out');
+    setTimeout(() => {
+      ls.style.display = 'none';
+      document.getElementById('main').style.opacity = '1';
+      // Animate pipeline bars after reveal
+      animatePipelineBars();
+    }, 500);
+  }, 1800);
+
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      navbar.style.boxShadow = '0 2px 20px rgba(11,109,130,0.25)';
+      navbar.style.padding = '10px 0';
+    } else {
+      navbar.style.boxShadow = 'none';
+      navbar.style.padding = '16px 0';
+    }
+  });
+
+  // Mobile menu
+  const toggle = document.getElementById('mobile-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+  let mobileOpen = false;
+  toggle.addEventListener('click', () => {
+    mobileOpen = !mobileOpen;
+    mobileMenu.classList.toggle('open', mobileOpen);
+    menuIcon.style.display = mobileOpen ? 'none' : 'block';
+    closeIcon.style.display = mobileOpen ? 'block' : 'none';
+  });
+  function closeMobile() {
+    mobileOpen = false;
+    mobileMenu.classList.remove('open');
+    menuIcon.style.display = 'block';
+    closeIcon.style.display = 'none';
+  }
+
+  // Product tabs
+  function setProduct(id) {
+    document.querySelectorAll('.product-mockup').forEach(m => { m.style.display = 'none'; m.classList.remove('active'); });
+    document.querySelectorAll('.product-tab').forEach(t => {
+      t.style.background = '';
+      t.style.boxShadow = '';
+      t.style.borderColor = 'transparent';
+      t.querySelector('h3').style.color = '#45606C';
+      const icon = t.querySelector('div');
+      if (icon) { icon.style.background = '#F6FBFC'; icon.style.color = '#45606C'; }
+    });
+    const mockup = document.getElementById('mockup-' + id);
+    if (mockup) { mockup.style.display = 'block'; mockup.classList.add('active'); }
+    const tab = document.getElementById('tab-' + id);
+    if (tab) {
+      tab.style.background = '#fff';
+      tab.style.boxShadow = '0 4px 12px rgba(15,135,160,0.1)';
+      tab.style.borderColor = 'rgba(15,135,160,0.15)';
+      tab.querySelector('h3').style.color = '#072D38';
+      const icon = tab.querySelector('div');
+      if (icon) { icon.style.background = 'rgba(15,135,160,0.1)'; icon.style.color = '#0F87A0'; }
+    }
+  }
+
+  // FAQ Accordion
+  function toggleFaq(trigger) {
+    const content = trigger.nextElementSibling;
+    const isOpen = content.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
+    document.querySelectorAll('.accordion-trigger').forEach(t => t.classList.remove('open'));
+    // Remove padding from all
+    document.querySelectorAll('.accordion-content').forEach(c => { c.style.paddingBottom = '0'; c.style.paddingTop = '0'; });
+    if (!isOpen) {
+      content.classList.add('open');
+      content.style.paddingBottom = '20px';
+      content.style.paddingTop = '4px';
+      trigger.classList.add('open');
+    }
+  }
+
+  // Contact form
+  function handleContact(e) {
+    e.preventDefault();
+    const name = document.getElementById('f-name').value;
+    const email = document.getElementById('f-email').value;
+    const company = document.getElementById('f-company').value;
+    const message = document.getElementById('f-message').value;
+    window.location.href = `mailto:janhavikhonde20@gmail.com?subject=Book a Demo - KodeKraft&body=Name: ${encodeURIComponent(name)}%0ACompany: ${encodeURIComponent(company)}%0AEmail: ${encodeURIComponent(email)}%0AMessage: ${encodeURIComponent(message)}`;
+  }
+
+  // Intersection Observer for reveal animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+  // Pipeline bars animation
+  function animatePipelineBars() {
+    document.querySelectorAll('.pipeline-bar-fill').forEach(bar => {
+      const w = bar.getAttribute('data-width');
+      if (w) setTimeout(() => { bar.style.width = w; }, 800);
+    });
+  }
+</script>
+</body>
+</html>
